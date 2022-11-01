@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "pico/bootrom.h"
 
 #define LED_PIN PICO_DEFAULT_LED_PIN
 
@@ -96,6 +97,7 @@ static void print_help(void)
     for (uint i = 0; i < rf_num_cmds; i++) {
         printf("%c: %s\n", rf_cmds[i].key, rf_cmds[i].help);
     }
+    printf("u: Reboot to BOOTSEL mode\n");
     printf("?: Print this help message\n");
 }
 
@@ -119,6 +121,8 @@ int main(void)
 
         if (c == '?') {
             print_help();
+        } else if (c == 'u') {
+            reset_usb_boot(0, 0);
         } else {
             enum rf_result ret = rf_execute(c);
             switch (ret) {
