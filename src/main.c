@@ -19,7 +19,8 @@
 #define RF_DELAY_SHORT_PULSE      250u  /* ms */
 #define RF_DELAY_INTER_PULSE      250u  /* ms */
 
-#define RF_DELAY_INDICATION     10000u  /* ms */
+#define RF_DELAY_INDICATION      1000u  /* ms */
+#define RF_DELAY_ERROR           8000u  /* ms */
 
 struct rf_command {
     char key;           /**< Command invocation character */
@@ -154,10 +155,16 @@ static enum rf_result rf_execute(char key)
     rf_trigger(rf_cmds[cmd].gpio, rf_cmds[cmd].nump);
 
     /* Wait for confirmation. */
-    sleep_ms(RF_DELAY_INDICATION);
+    sleep_ms(RF_DELAY_INDICATION * (rf_cmds[cmd].nump + 1));
 
     /* Get response. */
     ret = rf_get_response(cmd);
+
+    /* Something went wrong, wait for the error indication. */
+    if (ret != RF_OK) {
+        sleep_ms(RF_DELAY_ERROR);
+        ret = rf_get_response(cmd);
+    }
 
     return ret;
 }
