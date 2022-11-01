@@ -107,8 +107,11 @@ static void rf_init_pins(void)
     }
 }
 
-static void rf_trigger(uint gpio, uint nump)
+static void rf_trigger(uint cmd)
 {
+    uint nump = rf_cmds[cmd].nump;
+    uint gpio = rf_cmds[cmd].gpio;
+
     /* Emulating open-drain output. */
     for (uint i = 0; i < nump; i++) {
         gpio_set_oeover(gpio, GPIO_OVERRIDE_HIGH);  /* enable output -> low */
@@ -152,7 +155,7 @@ static enum rf_result rf_execute(char key)
     printf("request: %s\n", rf_cmds[cmd].help);
 
     /* Press the button. */
-    rf_trigger(rf_cmds[cmd].gpio, rf_cmds[cmd].nump);
+    rf_trigger(cmd);
 
     /* Wait for confirmation. */
     sleep_ms(RF_DELAY_INDICATION * (rf_cmds[cmd].nump + 1));
