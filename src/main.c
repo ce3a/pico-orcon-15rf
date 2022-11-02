@@ -37,7 +37,6 @@ struct rf_response {
 
 enum rf_result {
     RF_OK,              /**< Success */
-    RF_E_CMD,           /**< Invalid command */
     RF_E_RSP,           /**< Unexpected response (LED indication) */
     RF_E_COM,           /**< RF communication error */
     RF_E_DEV            /**< Device error */
@@ -136,7 +135,7 @@ static enum rf_result rf_get_response(uint cmd)
     return RF_OK;
 }
 
-static enum rf_result rf_execute(char key)
+static void rf_execute(char key)
 {
     uint cmd;
     enum rf_result ret;
@@ -150,8 +149,10 @@ static enum rf_result rf_execute(char key)
         if (rf_cmds[cmd].key == key)
             break;
 
-    if (cmd == rf_num_cmds)
-        return RF_E_CMD;
+    if (cmd == rf_num_cmds) {
+        printf("error: unknown command\n");
+        return;
+    }
 
     printf("request: %s\n", rf_cmds[cmd].help);
 
@@ -170,7 +171,22 @@ static enum rf_result rf_execute(char key)
         ret = rf_get_response(cmd);
     }
 
-    return ret;
+    switch (ret) {
+    case RF_OK:
+        printf("state: %s\n", rf_cmds[cmd].help);
+        break;
+    case RF_E_RSP:
+        printf("error: command not confirmed\n");
+        break;
+    case RF_E_COM:
+        printf("error: device unreachable\n");
+        break;
+    case RF_E_DEV:
+        printf("error: device error\n");
+        break;
+    default:
+        ; /* should never happen */
+    }
 }
 
 static void print_help(void)
@@ -205,26 +221,7 @@ int main(void)
         } else if (c == 'u') {
             reset_usb_boot(0, 0);
         } else if (isalnum(c)) {
-            enum rf_result ret = rf_execute(c);
-            switch (ret) {
-            case RF_OK:
-                printf("confirmed\n");
-                break;
-            case RF_E_CMD:
-                printf("error: unknown command\n");
-                break;
-            case RF_E_RSP:
-                printf("error: command not confirmed\n");
-                break;
-            case RF_E_COM:
-                printf("error: device unreachable\n");
-                break;
-            case RF_E_DEV:
-                printf("error: device error\n");
-                break;
-            default:
-                ; /* should never happen */
-            }
+            rf_execute(c);
         } else {
             /* Ignore non alphanumeric characters. */
         }
