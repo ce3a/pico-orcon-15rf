@@ -198,6 +198,18 @@ static void print_help(void)
     printf("?: Print this help message\n");
 }
 
+char wait_for_input(void)
+{
+    char c;
+    gpio_put(LED_PIN, 0);
+    printf("> ");
+    c = getchar();
+    printf("%c\n", c);
+    gpio_put(LED_PIN, 1);
+
+    return c;
+}
+
 int main(void)
 {
     stdio_init_all();
@@ -207,12 +219,7 @@ int main(void)
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
     while (true) {
-        gpio_put(LED_PIN, 0);
-        printf("> ");
-        char c = getchar();
-        printf("%c\n", c);
-        gpio_put(LED_PIN, 1);
-
+        char c = wait_for_input();
         if (c == '?') {
             print_help();
         } else if (c == 'u') {
