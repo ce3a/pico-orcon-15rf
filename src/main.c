@@ -206,9 +206,6 @@ int main(void)
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
 
-    printf("ORCON 15RF button pusher\n");
-    printf("  Press ? for help.\n");
-
     while (true) {
         gpio_put(LED_PIN, 0);
         printf("> ");
