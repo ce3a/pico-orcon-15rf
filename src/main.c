@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <ctype.h>
 #include "pico/stdlib.h"
 #include "pico/bootrom.h"
 #include "hardware/gpio.h"
@@ -203,7 +204,7 @@ int main(void)
             print_help();
         } else if (c == 'u') {
             reset_usb_boot(0, 0);
-        } else {
+        } else if (isalnum(c)) {
             enum rf_result ret = rf_execute(c);
             switch (ret) {
             case RF_OK:
@@ -224,6 +225,8 @@ int main(void)
             default:
                 ; /* should never happen */
             }
+        } else {
+            /* Ignore non alphanumeric characters. */
         }
     }
 
