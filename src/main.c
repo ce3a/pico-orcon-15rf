@@ -219,6 +219,7 @@ int main(void)
         if (c == '?') {
             print_help();
         } else if (c == 'u') {
+            printf("rebooting to BOOTSEL mode...");
             reset_usb_boot(0, 0);
         } else if (isalnum(c)) {
             rf_execute(c);
