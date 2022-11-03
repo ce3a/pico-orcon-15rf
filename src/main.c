@@ -202,9 +202,13 @@ char wait_for_input(void)
 {
     char c;
     gpio_put(LED_PIN, 0);
+#if defined (WITH_PROMPT)
     printf("> ");
+#endif
     c = getchar();
+#if defined (WITH_PROMPT)
     printf("%c\n", c);
+#endif
     gpio_put(LED_PIN, 1);
 
     return c;
